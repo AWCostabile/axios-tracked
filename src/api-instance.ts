@@ -49,6 +49,8 @@ export class ApiInstance {
         ...headers,
       },
     }));
+
+    this.addEventListener = this.addEventListener.bind(this);
   }
 
   /* ================
