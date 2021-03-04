@@ -77,7 +77,7 @@ export class ApiInstance {
 
           this.handleEvent(Types.TrackedEvent.CANCELLED, actionName);
 
-          this.clearCancellationToken(actionName);
+          this.cancelTokens.delete(actionName);
         }
       },
     );
@@ -286,8 +286,14 @@ export class ApiInstance {
   };
 
   // Removes a Cancel Token
-  private clearCancellationToken = (requestName: string = '') => {
-    if (requestName) {
+  private clearCancellationToken = (requestName: string = '', time: number) => {
+    if (!requestName) {
+      return;
+    }
+
+    const token = this.cancelTokens.get(requestName);
+
+    if (token && token.time == time) {
       this.cancelTokens.delete(requestName);
     }
   };
@@ -295,13 +301,14 @@ export class ApiInstance {
   // Sets the Cancel Token
   private createCancellationToken = (
     actionName: string = '',
+    time: number,
     cancel: Canceler,
   ) => {
     if (actionName) {
       this.cancelTokens.set(actionName, {
         action: actionName,
         cancel,
-        time: new Date().valueOf(),
+        time,
       });
     }
   };
@@ -334,12 +341,13 @@ export class ApiInstance {
     ...config
   }: Types.TrackedRequest) => {
     let result: AxiosResponse<ResultType> | undefined;
+    const time = new Date().valueOf();
 
     try {
       // Create request and register a cancellation token
       result = await this.axiosInstance.request<ResultType>({
         cancelToken: new axios.CancelToken(
-          this.createCancellationToken.bind(this, name),
+          this.createCancellationToken.bind(this, name, time),
         ),
         ...config,
       });
@@ -348,7 +356,7 @@ export class ApiInstance {
       throw this.transformError(err);
     } finally {
       // Clear out any cancellation tokens created for this request
-      this.clearCancellationToken(name);
+      this.clearCancellationToken(name, time);
     }
 
     return result as AxiosResponse<ResultType>;
