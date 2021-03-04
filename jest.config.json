@@ -1,0 +1,8 @@
+{
+  "roots": ["__tests__"],
+  "modulePaths": ["node_modules", "src", "__tests__"],
+  "moduleDirectories": ["node_modules", "src", "<rootDir>", "__tests__"],
+  "moduleFileExtensions": ["ts", "js"],
+  "testRegex": "/__tests__/.*test.(ts|js)$",
+  "transform": { ".(ts|tsx)": "ts-jest" }
+}
