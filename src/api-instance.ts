@@ -384,17 +384,16 @@ export class ApiInstance {
       // If successful handle then success work-flow
       this.handleEvent(Types.TrackedEvent.SUCCESS, action, result);
     } catch (error) {
-      // If error is due to cancelled request then ignore and throw error
-      if (axios.isCancel(error)) {
-        throw error;
+      const isCancel = axios.isCancel(error);
+      // If error is NOT due to cancelled request then assume request
+      // was unsuccessful and handle error work-flow
+      if (!isCancel) {
+        this.handleEvent(Types.TrackedEvent.ERROR, action, undefined, error);
       }
-
-      // If unsuccessful then handle error work-flow
-      this.handleEvent(Types.TrackedEvent.ERROR, action, undefined, error);
 
       // If errors are explicitly to be thrown, do so. This assumes errors
       // will be handled outside the typical API transaction flow of the app
-      if (throwError) {
+      if (isCancel || throwError) {
         throw error;
       }
     }
