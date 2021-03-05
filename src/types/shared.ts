@@ -1,7 +1,6 @@
 import { AxiosRequestConfig } from 'axios';
 import { Method, TrackedError } from './base';
 import { CancelToken } from './internal';
-
 export interface TrackedConfig extends AxiosRequestConfig {
   baseURL?: string;
   prefix?: string;

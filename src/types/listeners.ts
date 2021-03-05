@@ -1,5 +1,4 @@
 import { AxiosResponse } from 'axios';
-import { RequestOptions } from 'http';
 import { TrackedError, TrackedEvent } from './base';
 import { EventType } from './internal';
 
