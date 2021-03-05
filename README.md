@@ -1,16 +1,24 @@
 # Axios Tracked
 
-An enhancement to Axios which allows requests to have tracking, event listeners, and easy cancellation.
+An enhancement to run alongside Axios, adding named tracking, event subscriptions, and easy cancellation for API requests.
 
 ## Install
 
 ```
-$ npm install axios-tracked
+$ npm install axios axios-tracked
 ```
 
-## Basic Usage
+## Demo Project
+
+Clone and run the "[`Axios-Tracked-Example`](https://github.com/AWCostabile/axios-tracked-example)" project to see examples of how to use the `axios-tracked` module and test out its capabilities. Whilst this project is React and Typescript, there is no necessity to sticking with those, as this package is designed to be low dependency.
+
+# Usage
 
 To use `axios-tracked`, simply import the package and begin by creating an API instnace using the `createInstance` function. This API instance works much the same way as the main Axios API instance, however it provides some additional functionality to make requests and cancellations easier, as well as the ability to handle side-effects based on request events.
+
+## Basics
+
+The recommended approach to using `axios-tracked` is to export and use a single api instance with which all endpoints can be defined.
 
 ```javascript
 const axiosTracked = require('axios-tracked');
@@ -71,7 +79,7 @@ const createTodo = function (newTodo) {
 
 ## Events
 
-Events are a powerful way to trigger side-effects within an app based on the way a request was resolved without needing to monitor each and every request individually. This is done via the `addEventHandler` method on the API instance, which will always return an unsubscribe function (see below).
+Events add an additional method by which side-effects within an app can be triggered. This is based on the lifecycle of each request and how it is resolved end to end without needing to monitor each and every request individually. This is done via the `subscribe` method on the API instance, which will always return an `unsubscribe` function for clean-up (see below).
 
 ### Event Types
 
@@ -94,10 +102,10 @@ Events are a powerful way to trigger side-effects within an app based on the way
 
 #### _NOTE: `resolved` events will contain the `type` property of the triggering event type_
 
-### Usage
+### Subscribing to Events
 
 ```javascript
-// Register event handlers
+// Declare loading states
 let isLoadingItem = false;
 let isLoadingList = false;
 
@@ -113,11 +121,11 @@ function handleOnRequest(req) {
   }
 }
 
-// Add a predefined event listener for when a request is initiated
-apiInstance.addEventHandler('request', handleOnRequest);
+// Subscribe to `request` events and handle with pre-defined function
+apiInstance.subscribe('request', handleOnRequest);
 
-// Add an in-situe listener for when an api request is completed
-apiInstance.addEventHandler('resolved', function (res) {
+// Subscribe to `resolved` events and handle with in-situ function
+apiInstance.subscribe('resolved', function (res) {
   switch (res.action) {
     case 'GET_TODO':
       // Only stop loading IF the request succeeded
@@ -129,8 +137,8 @@ apiInstance.addEventHandler('resolved', function (res) {
   }
 });
 
-// Add an event listener specifically for when an error is thrown
-apiInstance.addEventHandler('error', function (res) {
+// Subscribe to `error` events to handle thrown errors
+apiInstance.subscribe('error', function (res) {
   if (res.action == 'GET_TODO_LIST') {
     // specifically handle the action 'GET_TODOS_LIST'
     alert('Could not fetch all Todos');
@@ -140,8 +148,8 @@ apiInstance.addEventHandler('error', function (res) {
   }
 });
 
-// Add a listener to handle newly created TODOs
-const unsubscribe = apiInstance.addEventHandler('success', function (res) {
+// Subscribe to `success` events to handle newly created TODOs
+const unsubscribe = apiInstance.subscribe('success', function (res) {
   if (res.action != 'CREATE_TODO') {
     return;
   }
@@ -153,8 +161,7 @@ const unsubscribe = apiInstance.addEventHandler('success', function (res) {
   }
 });
 
-// Adding an event listener returns an unsubscribe method that can be
-// used for state clean-up
+// In the case of clean-up, calling `unsubscribe` will remove the listeners
 function onUmount() {
   unsubscribe();
 }
@@ -196,7 +203,6 @@ const getTodoById = (id: string) => apiInstance.tracked({
   .then((res) =>console.log(res.data))
   .catch((err) => console.error(err));
 
-
 // Create a POST request handler for a posting a new Todo
 const createTodo = (todo: Omit<TodoModel, 'id'>) => apiInstance.tracked({
     action: TodoActions.CREATE,
@@ -206,6 +212,7 @@ const createTodo = (todo: Omit<TodoModel, 'id'>) => apiInstance.tracked({
   .then((res) =>console.log(res.data))
   .catch((err) => console.error(err));
 
+// Define a typed handler to be registered with the `susbcribe` method
 const handleError: ErrorListener<TodoActions> = ({ action, error }) => {
   if (action == TodoActions.LIST) {
     // specifically handle the action 'GET_TODOS_LIST'
@@ -216,11 +223,15 @@ const handleError: ErrorListener<TodoActions> = ({ action, error }) => {
   }
 };
 
-// Use strong typing in defining an event handler
-const unsubscribe = apiInstance.addEventHandler(
+// In the case of clean-up, calling `unsubscribe` will remove the listener
+const unsubscribe = apiInstance.subscribe(
   TrackedEvent.ERROR,
   handleError
 });
 ```
+
+# Upcoming Features
+
+In the near future, the plan is to add a complimentary package for React to make it easier to "hook" into API events to simplify the passing of API state to Component Props.
 
 #### _More to come_
