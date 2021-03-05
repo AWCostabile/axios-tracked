@@ -50,7 +50,7 @@ export class ApiInstance {
       },
     }));
 
-    this.addEventListener = this.addEventListener.bind(this);
+    this.subscribe = this.subscribe.bind(this);
   }
 
   /* ================
@@ -181,36 +181,36 @@ export class ApiInstance {
     };
   }
 
-  public addEventListener<Action extends string = string>(
+  public subscribe<Action extends string = string>(
     eventName: Types.EventType | Types.TrackedEvent,
     listener: Types.GeneralListener<Action>,
   ): void;
 
-  public addEventListener<Action extends string = string>(
+  public subscribe<Action extends string = string>(
     eventName: Types.TrackedEvent.CANCELLED | 'cancelled',
     listener: Types.CancelledListener<Action>,
   ): void;
 
-  public addEventListener<Action extends string = string>(
+  public subscribe<Action extends string = string>(
     eventName: Types.TrackedEvent.ERROR | 'error',
     listener: Types.ErrorListener<Action>,
   ): void;
 
-  public addEventListener<Action extends string = string>(
+  public subscribe<Action extends string = string>(
     eventName: Types.TrackedEvent.REQUEST | 'request',
     listener: Types.RequestListener<Action>,
   ): void;
-  public addEventListener<Action extends string = string>(
+  public subscribe<Action extends string = string>(
     eventName: Types.TrackedEvent.RESOLVED | 'resolved',
     listener: Types.ResolvedListener<Action>,
   ): void;
 
-  public addEventListener<Action extends string = string>(
+  public subscribe<Action extends string = string>(
     eventName: Types.TrackedEvent.SUCCESS | 'success',
     listener: Types.SuccessListener<Action>,
   ): void;
 
-  public addEventListener<Action extends string = string>(
+  public subscribe<Action extends string = string>(
     eventName: Types.TrackedEvent | Types.EventType,
     listener:
       | Types.GeneralListener<Action>
