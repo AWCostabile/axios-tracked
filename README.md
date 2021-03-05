@@ -9,6 +9,7 @@ $ npm install axios-tracked
 ```
 
 ## Basic Usage
+
 To use `axios-tracked`, simply import the package and begin by creating an API instnace using the `createInstance` function. This API instance works much the same way as the main Axios API instance, however it provides some additional functionality to make requests and cancellations easier, as well as the ability to handle side-effects based on request events.
 
 ```javascript
@@ -160,20 +161,21 @@ function onUmount() {
 ```
 
 ## Typescript Support
+
 Typescript is built into `axios-tracked` so there is no need to install additional `@type` packages. The example below demonstrates how some of the earlier code could be written with Typescript.
 
 ```typescript
-import { createInstance, ErrorListener, TrackedEvent } from 'axios-tracked';
+import { createInstance, ErrorListener, TrackedEvent, TrackedInstance } from 'axios-tracked';
 
 // create instance
-const apiInstance = axiosTracked.createInstance({
+const apiInstance: TrackedInstance = axiosTracked.createInstance({
   baseURL: 'https://jsonplaceholder.typicode.com',
   timeout: 30000,
 });
 
 enum TodoActions {
   CREATE = 'CREATE_TODO',
-  GET = 'GET_TODO'
+  GET = 'GET_TODO',
   LIST = 'GET_TODO_LIST',
 }
 
